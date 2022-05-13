@@ -1,0 +1,24 @@
+version: "3.8"
+
+services:
+  localstack:
+    container_name: "localstack"
+    image: localstack/localstack:0.14
+    ports:
+      - "127.0.0.1:53:53"                # only required for Pro (DNS)
+      - "127.0.0.1:53:53/udp"            # only required for Pro (DNS)
+      - "127.0.0.1:443:443"              # only required for Pro (LocalStack HTTPS Edge Proxy)
+      - "127.0.0.1:4510-4559:4510-4559"  # external service port range
+      - "127.0.0.1:4566:4566"            # LocalStack Edge Proxy
+    environment:
+      - DOCKER_HOST=unix:///var/run/docker.sock
+      - SERVICES=lambda,iam,cloudwatch,s3,elasticache # Only needed services were enabled
+      - LOCALSTACK_API_KEY=${LOCALSTACK_API_KEY-}
+      - LAMBDA_EXECUTOR=docker
+      - DEFAULT_REGION=us-east-1
+      - DEBUG=1
+      - DATA_DIR=/tmp/localstack/data
+
+    volumes:
+      - "${TMPDIR:-/tmp}/localstack:/tmp/localstack"
+      - "/var/run/docker.sock:/var/run/docker.sock"
